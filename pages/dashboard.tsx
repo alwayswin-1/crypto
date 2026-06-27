@@ -6,13 +6,16 @@ export default function Dashboard() {
   const router = useRouter();
 
   useEffect(()=>{
-    const t = localStorage.getItem('token');
-    if (!t) return router.push('/login');
-    fetch('/api/auth/me', { headers: { Authorization: `Bearer ${t}` } }).then(r=>r.json()).then(data=>{
+    const init = async () => {
+      const t = localStorage.getItem('token');
+      if (!t) return router.push('/login');
+      const res = await fetch('/api/auth/me', { headers: { Authorization: `Bearer ${t}` } });
+      const data = await res.json();
       if (data.error) return router.push('/login');
       setUser(data.user);
-    });
-  },[]);
+    };
+    void init();
+  },[router]);
 
   if (!user) return <div className="min-h-screen flex items-center justify-center text-white">Loading...</div>
 
