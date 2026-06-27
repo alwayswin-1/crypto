@@ -4,8 +4,7 @@ import { NextApiRequest } from 'next';
 const JWT_SECRET = process.env.JWT_SECRET || 'dev_secret';
 
 export function signToken(payload: object, expiresIn: string | number = '7d') {
-  const options: SignOptions = { expiresIn };
-  return sign(payload as string | object, JWT_SECRET, options);
+  return sign(payload as string | object, JWT_SECRET, { expiresIn: expiresIn as any });
 }
 
 export function verifyToken(token: string) {
