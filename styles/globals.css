@@ -1,6 +1,43 @@
-@tailwind base;
+﻿@tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 html, body, #__next { height: 100%; }
 body { font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; }
+
+/* Dot wave background animation */
+.dot-wave {
+  background-image:
+    radial-gradient(circle, rgba(14, 178, 183, 0.48) 1px, transparent 1px),
+    radial-gradient(circle, rgba(14, 178, 183, 0.24) 1px, transparent 1px),
+    radial-gradient(circle, rgba(14, 178, 183, 0.12) 1px, transparent 1px);
+  background-size: 28px 28px, 56px 56px, 112px 112px;
+  background-position: 0 0, 14px 14px, 28px 28px;
+  opacity: 0.72;
+  mix-blend-mode: screen;
+  filter: blur(0.3px);
+  animation: waveDots 26s linear infinite;
+}
+
+@keyframes waveDots {
+  0% {
+    background-position: 0 0, 0 0, 0 0;
+    transform: translate3d(0, 0, 0);
+  }
+  25% {
+    background-position: 0 60px, 0 -42px, 0 32px;
+    transform: translate3d(4px, -8px, 0);
+  }
+  50% {
+    background-position: 0 120px, 0 -84px, 0 64px;
+    transform: translate3d(0, 0, 0);
+  }
+  75% {
+    background-position: 0 60px, 0 -42px, 0 32px;
+    transform: translate3d(-4px, 8px, 0);
+  }
+  100% {
+    background-position: 0 0, 0 0, 0 0;
+    transform: translate3d(0, 0, 0);
+  }
+}

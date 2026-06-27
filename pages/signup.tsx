@@ -1,31 +1,17 @@
-import { useState } from 'react';
-import { useRouter } from 'next/router';
+﻿import Link from 'next/link';
 
 export default function Signup() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const router = useRouter();
-
-  async function handle(e: any) {
-    e.preventDefault();
-    setError('');
-    const res = await fetch('/api/auth/signup', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, password }) });
-    const data = await res.json();
-    if (!res.ok) return setError(data.error || 'Error');
-    localStorage.setItem('token', data.token);
-    router.push('/dashboard');
-  }
-
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-gray-900 to-gray-800 text-white">
-      <form onSubmit={handle} className="bg-gray-900/60 p-8 rounded shadow max-w-md w-full">
-        <h2 className="text-2xl mb-4">Create an account</h2>
-        {error && <div className="mb-2 text-red-400">{error}</div>}
-        <input className="w-full mb-2 p-2 rounded bg-gray-800" value={email} onChange={e=>setEmail(e.target.value)} placeholder="Email" />
-        <input className="w-full mb-4 p-2 rounded bg-gray-800" value={password} onChange={e=>setPassword(e.target.value)} placeholder="Password" type="password" />
-        <button className="w-full py-2 bg-indigo-600 rounded">Sign Up</button>
-      </form>
+    <div className="min-h-screen bg-[#020617] text-white flex items-center justify-center px-6">
+      <div className="max-w-xl w-full rounded-[2rem] border border-white/10 bg-slate-950/80 p-10 shadow-2xl backdrop-blur-xl">
+        <p className="text-sm uppercase tracking-[0.3em] text-cyan-300">CryptoShield</p>
+        <h1 className="mt-6 text-4xl font-semibold tracking-tight">Sign-up currently paused</h1>
+        <p className="mt-4 text-slate-300 leading-7">We're focusing on perfecting the CryptoShield dashboard and user experience first. Please log in while we finish this phase.</p>
+        <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center">
+          <Link href="/login" className="inline-flex justify-center rounded-full bg-cyan-400 px-6 py-3 text-slate-950 font-semibold hover:bg-cyan-300">Log In</Link>
+          <a className="inline-flex justify-center rounded-full border border-white/10 px-6 py-3 text-white text-center" href="#features">Why CryptoShield</a>
+        </div>
+      </div>
     </div>
   );
 }
