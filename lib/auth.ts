@@ -3,7 +3,7 @@ import { NextApiRequest } from 'next';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'dev_secret';
 
-export function signToken(payload: object, expiresIn = '7d') {
+export function signToken(payload: object, expiresIn: string | number = '7d') {
   return jwt.sign(payload, JWT_SECRET, { expiresIn });
 }
 
