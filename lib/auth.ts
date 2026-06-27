@@ -1,14 +1,15 @@
-import jwt from 'jsonwebtoken';
+import { sign, verify, type SignOptions } from 'jsonwebtoken';
 import { NextApiRequest } from 'next';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'dev_secret';
 
 export function signToken(payload: object, expiresIn: string | number = '7d') {
-  return jwt.sign(payload, JWT_SECRET, { expiresIn });
+  const options: SignOptions = { expiresIn };
+  return sign(payload as string | object, JWT_SECRET, options);
 }
 
 export function verifyToken(token: string) {
-  return jwt.verify(token, JWT_SECRET);
+  return verify(token, JWT_SECRET);
 }
 
 export function getTokenFromRequest(req: NextApiRequest) {
