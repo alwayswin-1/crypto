@@ -3,12 +3,12 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 
-import heroImage from '../image/runzero-dashboard-4-9-dark.webp';
+import heroImage from '../image/Apex-Blog_Tile.webp';
 import bgLeft from '../image/bg-zero-grid-left-dark.svg';
 import bgRight from '../image/bg-zero-grid-right-dark.svg';
-import assetInventoryImage from '../image/Asset-Inventory.webp';
-import attackSurfaceImage from '../image/Attack-Surface.webp';
-import riskImage from '../image/Risk.webp';
+import assetInventoryImage from '../image/cryptoshield2.png';
+import attackSurfaceImage from '../image/Platform-EM-Updates_Pillar1.webp';
+import riskImage from '../image/cryptoshield3.png';
 import apiImage from '../image/API.webp';
 
 const stats = [
