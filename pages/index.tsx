@@ -29,7 +29,6 @@ export default function Home() {
 
           <div className="flex items-center gap-3">
             <Link href="/signup" className="rounded-full bg-yellow-400 px-5 py-2.5 text-sm font-semibold text-slate-950 shadow-lg shadow-yellow-500/10 transition hover:bg-yellow-300">Sign Up</Link>
-            <Link href="/login" className="rounded-full border border-white/15 px-5 py-2.5 text-sm text-white transition hover:bg-white/10">Log In</Link>
           </div>
         </header>
 
@@ -46,9 +45,6 @@ export default function Home() {
             <div className="mt-8 flex flex-col items-center justify-center gap-4 md:flex-row md:gap-8">
               <Link href="/signup" className="inline-flex items-center justify-center rounded-full border-2 border-yellow-400 bg-yellow-400 px-7 py-3 text-sm font-semibold text-slate-950 transition hover:border-cyan-400 hover:bg-cyan-400">
                 Get Started
-              </Link>
-              <Link href="/login" className="inline-flex items-center justify-center rounded-full border-2 border-white bg-transparent px-7 py-3 text-sm font-semibold text-white transition hover:bg-white hover:text-slate-950">
-                Already have an account?
               </Link>
             </div>
           </div>
