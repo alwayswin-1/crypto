@@ -63,6 +63,7 @@ export default function Dashboard() {
       const formData = new FormData();
       formData.append('slug', slug);
       formData.append('file', selectedFile, selectedFile.name);
+      formData.append('uploaderEmail', user?.email || 'admin@example.com');
 
       const res = await fetch('/api/files/upload', {
         method: 'POST',
