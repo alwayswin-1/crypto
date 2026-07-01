@@ -1,6 +1,9 @@
 ﻿import { useState } from 'react';
 import { useRouter } from 'next/router';
 
+const ADMIN_EMAIL = process.env.NEXT_PUBLIC_ADMIN_EMAIL || 'admin@example.com';
+const ADMIN_PASSWORD = process.env.NEXT_PUBLIC_ADMIN_PASSWORD || 'admin123';
+
 export default function Signup() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -13,17 +16,17 @@ export default function Signup() {
     setError('');
     setLoading(true);
 
-    const res = await fetch('/api/auth/signup', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password }),
-    });
+    const normalizedEmail = email.trim().toLowerCase();
+    const normalizedAdminEmail = ADMIN_EMAIL.trim().toLowerCase();
 
-    const data = await res.json();
+    if (normalizedEmail !== normalizedAdminEmail || password !== ADMIN_PASSWORD) {
+      setLoading(false);
+      return setError('Only the admin account is allowed to sign in.');
+    }
+
+    localStorage.setItem('admin-auth', 'true');
+    localStorage.setItem('admin-email', ADMIN_EMAIL);
     setLoading(false);
-    if (!res.ok) return setError(data.error || 'Signup failed');
-
-    localStorage.setItem('token', data.token);
     router.push('/dashboard');
   }
 

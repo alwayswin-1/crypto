@@ -1,27 +1,25 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { getTokenFromRequest, verifyToken } from '../../../lib/auth';
+import { promises as fs } from 'fs';
+import path from 'path';
 import { prisma } from '../../../lib/prisma';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const token = getTokenFromRequest(req);
-  if (!token) return res.status(401).json({ error: 'Unauthorized' });
+  if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' });
+
+  const uploads = await prisma.fileUpload.findMany({
+    orderBy: { uploadedAt: 'desc' },
+    include: { uploader: true, downloads: true },
+  });
+
+  const downloadsFile = path.join(process.cwd(), 'data', 'downloads.json');
+  let downloaders: any[] = [];
 
   try {
-    const payload: any = verifyToken(token);
-    if (payload.role !== 'admin') return res.status(403).json({ error: 'Admin only' });
-
-    const uploads = await prisma.fileUpload.findMany({
-      orderBy: { uploadedAt: 'desc' },
-      include: { uploader: true, downloads: true },
-    });
-
-    const downloaders = await prisma.download.findMany({
-      orderBy: { createdAt: 'desc' },
-      include: { file: true },
-    });
-
-    return res.status(200).json({ uploads, downloaders });
-  } catch (err) {
-    return res.status(401).json({ error: 'Invalid token' });
+    const data = await fs.readFile(downloadsFile, 'utf8');
+    downloaders = JSON.parse(data);
+  } catch {
+    downloaders = [];
   }
+
+  return res.status(200).json({ uploads, downloaders });
 }

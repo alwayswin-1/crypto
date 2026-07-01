@@ -21,14 +21,28 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const geo = geoip.lookup(ip);
   const country = geo?.country ?? 'unknown';
 
-  await prisma.download.create({
-    data: {
-      fileId: file.id,
-      ip,
-      country,
-      userAgent: req.headers['user-agent']?.toString() ?? null,
-    },
-  });
+  const downloadsFile = path.join(process.cwd(), 'data', 'downloads.json');
+  const downloadEntry = {
+    id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+    slug,
+    file: file.originalName,
+    ip,
+    country,
+    userAgent: req.headers['user-agent']?.toString() ?? null,
+    createdAt: new Date().toISOString(),
+  };
+
+  let downloads: any[] = [];
+  try {
+    const current = await fs.readFile(downloadsFile, 'utf8');
+    downloads = JSON.parse(current);
+  } catch {
+    downloads = [];
+  }
+
+  downloads.unshift(downloadEntry);
+  await fs.mkdir(path.dirname(downloadsFile), { recursive: true });
+  await fs.writeFile(downloadsFile, JSON.stringify(downloads, null, 2));
 
   const filePath = path.join(process.cwd(), 'public', 'uploads', file.filename);
 

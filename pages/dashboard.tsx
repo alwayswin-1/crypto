@@ -1,6 +1,5 @@
 ﻿import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/router';
-import Link from 'next/link';
 
 export default function Dashboard() {
   const [user, setUser] = useState<any>(null);
@@ -34,8 +33,8 @@ export default function Dashboard() {
     return btoa(binary);
   };
 
-  const fetchMetrics = async (token: string) => {
-    const res = await fetch('/api/files', { headers: { Authorization: `Bearer ${token}` } });
+  const fetchMetrics = async () => {
+    const res = await fetch('/api/files');
     const data = await res.json();
     if (res.ok) {
       setUploads(data.uploads || []);
@@ -45,14 +44,13 @@ export default function Dashboard() {
 
   useEffect(() => {
     const init = async () => {
-      const t = localStorage.getItem('token');
-      if (!t) return router.push('/login');
-      const res = await fetch('/api/auth/me', { headers: { Authorization: `Bearer ${t}` } });
-      const data = await res.json();
-      if (data.error) return router.push('/login');
-      setUser(data.user);
+      const isAuthed = localStorage.getItem('admin-auth') === 'true';
+      if (!isAuthed) return router.push('/signup');
+
+      const adminEmail = localStorage.getItem('admin-email') || 'admin@example.com';
+      setUser({ email: adminEmail });
       setLoading(false);
-      await fetchMetrics(t);
+      await fetchMetrics();
     };
     void init();
   }, [router]);
@@ -71,19 +69,12 @@ export default function Dashboard() {
     setUploadSuccess('');
     setUploading(true);
 
-    const token = localStorage.getItem('token');
-    if (!token) {
-      setUploadError('You must be logged in.');
-      setUploading(false);
-      return;
-    }
-
     const fileBuffer = await selectedFile.arrayBuffer();
     const content = await arrayBufferToBase64(fileBuffer);
 
     const res = await fetch('/api/files/upload', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ slug, filename: selectedFile.name, content }),
     });
 
@@ -101,8 +92,9 @@ export default function Dashboard() {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
-    router.push('/login');
+    localStorage.removeItem('admin-auth');
+    localStorage.removeItem('admin-email');
+    router.push('/signup');
   };
 
   if (loading) {
