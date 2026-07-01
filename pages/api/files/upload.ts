@@ -11,7 +11,7 @@ const storage = multer.diskStorage({
   destination(_req, _file, cb) {
     fs.mkdir(uploadDir, { recursive: true })
       .then(() => cb(null, uploadDir))
-      .catch(cb);
+      .catch((error) => cb(error as Error, uploadDir));
   },
   filename(_req, file, cb) {
     const safeName = file.originalname.replace(/[^a-zA-Z0-9._-]/g, '_');

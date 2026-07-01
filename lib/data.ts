@@ -46,7 +46,7 @@ async function ensureDataFile() {
   try {
     await fs.access(dataFile);
   } catch {
-    await writeData(defaultData);
+    await saveData(defaultData);
   }
 }
 
@@ -57,7 +57,7 @@ export async function readData(): Promise<AppData> {
     const content = await fs.readFile(dataFile, 'utf8');
     return JSON.parse(content) as AppData;
   } catch {
-    await writeData(defaultData);
+    await saveData(defaultData);
     return defaultData;
   }
 }
