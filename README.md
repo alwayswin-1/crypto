@@ -28,6 +28,7 @@ npm run start
 1. Push this repository to GitHub.
 2. Create a new Railway project and connect the GitHub repo.
 3. Add these environment variables:
+   - DATABASE_PROVIDER=postgresql
    - DATABASE_URL=postgresql://...
    - JWT_SECRET=your-strong-secret
    - NEXT_PUBLIC_ADMIN_EMAIL=admin@example.com
@@ -36,4 +37,4 @@ npm run start
    - Build Command: npm run build
    - Start Command: npm start
 
-> Note: This app uses Prisma. For Railway, switch from SQLite to PostgreSQL.
+> Note: This app now selects the Prisma schema automatically based on `DATABASE_PROVIDER`. For Railway, set `DATABASE_PROVIDER=postgresql` and use a PostgreSQL `DATABASE_URL`.

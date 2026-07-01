@@ -3,11 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "prisma:migrate": "prisma migrate dev --name init",
-    "prisma:generate": "prisma generate",
+    "prepare-schema": "node ./scripts/select-prisma-schema.js",
+    "dev": "npm run prepare-schema && next dev",
+    "build": "npm run prepare-schema && next build",
+    "start": "npm run prepare-schema && next start",
+    "prisma:migrate": "npm run prepare-schema && prisma migrate dev --name init",
+    "prisma:generate": "npm run prepare-schema && prisma generate",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx"
   },
   "dependencies": {
