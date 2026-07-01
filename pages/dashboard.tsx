@@ -23,17 +23,6 @@ export default function Dashboard() {
     }, {});
   }, [downloaders]);
 
-  const arrayBufferToBase64 = async (buffer: ArrayBuffer) => {
-    const bytes = new Uint8Array(buffer);
-    let binary = '';
-    const chunkSize = 0x8000;
-    for (let i = 0; i < bytes.length; i += chunkSize) {
-      const chunk = bytes.subarray(i, i + chunkSize);
-      binary += String.fromCharCode(...chunk);
-    }
-    return btoa(binary);
-  };
-
   const fetchMetrics = async () => {
     const res = await fetch('/api/files');
     const data = await res.json();
@@ -71,13 +60,13 @@ export default function Dashboard() {
     setUploading(true);
 
     try {
-      const fileBuffer = await selectedFile.arrayBuffer();
-      const content = await arrayBufferToBase64(fileBuffer);
+      const formData = new FormData();
+      formData.append('slug', slug);
+      formData.append('file', selectedFile, selectedFile.name);
 
       const res = await fetch('/api/files/upload', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ slug, filename: selectedFile.name, content }),
+        body: formData,
       });
 
       const data = await res.json();
