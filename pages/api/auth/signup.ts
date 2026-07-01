@@ -6,8 +6,9 @@ import { signToken } from '../../../lib/auth';
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
-  const { email, password } = req.body;
+  const { email, password, adminToken } = req.body;
   if (!email || !password) return res.status(400).json({ error: 'Missing fields' });
+  if (adminToken !== process.env.ADMIN_SIGNUP_TOKEN) return res.status(403).json({ error: 'Unauthorized' });
 
   try {
     const existing = await prisma.user.findUnique({ where: { email } });
@@ -24,7 +25,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     const token = signToken({ id: user.id, role: user.role });
     res.status(200).json({ token, user: { id: user.id, email: user.email, role: user.role } });
-  } catch (err) {
-    res.status(500).json({ error: 'Server error' });
+  } catch (err: any) {
+    console.error('Signup error:', err);
+    res.status(500).json({ error: 'Signup failed. Please try again.' });
   }
 }

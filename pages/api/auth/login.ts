@@ -14,7 +14,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     if (!ok) return res.status(400).json({ error: 'Invalid credentials' });
     const token = signToken({ id: user.id, role: user.role });
     res.status(200).json({ token, user: { id: user.id, email: user.email, role: user.role } });
-  } catch (err) {
-    res.status(500).json({ error: 'Server error' });
+  } catch (err: any) {
+    console.error('Login error:', err);
+    res.status(500).json({ error: 'Authentication failed. Please try again.' });
   }
 }

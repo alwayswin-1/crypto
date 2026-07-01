@@ -13,10 +13,16 @@ export default function Signup() {
     setError('');
     setLoading(true);
 
+    const adminToken = prompt('Enter admin token to create account:');
+    if (!adminToken) {
+      setLoading(false);
+      return;
+    }
+
     const res = await fetch('/api/auth/signup', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password }),
+      body: JSON.stringify({ email, password, adminToken }),
     });
 
     const data = await res.json();
