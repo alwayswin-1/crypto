@@ -29,7 +29,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   try {
     const { fields, files } = await parseForm(req);
-    const slug = Array.isArray(fields.slug) ? fields.slug[0] : fields.slug?.toString?.() ?? '';
+    const slug = typeof fields.slug === 'string' ? fields.slug : Array.isArray(fields.slug) ? fields.slug[0] : '';
     const uploadFile = files.file as formidable.File | formidable.File[] | undefined;
     const file = Array.isArray(uploadFile) ? uploadFile[0] : uploadFile;
 
