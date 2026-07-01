@@ -9,24 +9,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const { email, password } = req.body;
   if (!email || !password) return res.status(400).json({ error: 'Missing fields' });
 
-  const adminEmail = process.env.ADMIN_EMAIL;
-  const adminPassword = process.env.ADMIN_PASSWORD;
-  if (!adminEmail || !adminPassword) {
-    return res.status(500).json({ error: 'Admin signup is not configured' });
-  }
-
-  if (email !== adminEmail || password !== adminPassword) {
-    return res.status(403).json({ error: 'Invalid admin credentials' });
-  }
-
   try {
     const existing = await prisma.user.findUnique({ where: { email } });
-    if (existing) {
-      const valid = await bcrypt.compare(password, existing.password);
-      if (!valid) return res.status(403).json({ error: 'Invalid admin credentials' });
-      const token = signToken({ id: existing.id, role: existing.role });
-      return res.status(200).json({ token, user: { id: existing.id, email: existing.email, role: existing.role } });
-    }
+    if (existing) return res.status(400).json({ error: 'Email already in use' });
 
     const hashedPassword = await bcrypt.hash(password, 10);
     const user = await prisma.user.create({

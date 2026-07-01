@@ -31,9 +31,9 @@ export default function Signup() {
     <div className="min-h-screen bg-[#020617] text-white flex items-center justify-center px-6 py-10">
       <div className="max-w-xl w-full rounded-[2rem] border border-white/10 bg-slate-950/80 p-10 shadow-2xl backdrop-blur-xl">
         <p className="text-sm uppercase tracking-[0.3em] text-cyan-300">CryptoShield</p>
-        <h1 className="mt-6 text-4xl font-semibold tracking-tight">Admin sign-up</h1>
+        <h1 className="mt-6 text-4xl font-semibold tracking-tight">Create an account</h1>
         <p className="mt-4 text-slate-300 leading-7">
-          Only the administrator may create an account. Use the configured admin email and password for this deployment.
+          Sign up to manage and distribute your projects. Enter your email and password to get started.
         </p>
 
         <form onSubmit={handleSubmit} className="mt-8 space-y-4">
