@@ -1,4 +1,4 @@
-﻿import { useEffect, useMemo, useState } from 'react';
+﻿import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/router';
 
 export default function Dashboard() {
@@ -12,6 +12,7 @@ export default function Dashboard() {
   const [uploadError, setUploadError] = useState('');
   const [uploadSuccess, setUploadSuccess] = useState('');
   const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
   const router = useRouter();
 
   const downloaderByCountry = useMemo(() => {
@@ -69,26 +70,31 @@ export default function Dashboard() {
     setUploadSuccess('');
     setUploading(true);
 
-    const fileBuffer = await selectedFile.arrayBuffer();
-    const content = await arrayBufferToBase64(fileBuffer);
+    try {
+      const fileBuffer = await selectedFile.arrayBuffer();
+      const content = await arrayBufferToBase64(fileBuffer);
 
-    const res = await fetch('/api/files/upload', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ slug, filename: selectedFile.name, content }),
-    });
+      const res = await fetch('/api/files/upload', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ slug, filename: selectedFile.name, content }),
+      });
 
-    const data = await res.json();
-    setUploading(false);
-    if (!res.ok) {
-      setUploadError(data.error || 'Upload failed');
-      return;
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data?.error || 'Upload failed');
+      }
+
+      setUploadSuccess(`File uploaded. Download URL: /download/${data.file.slug}`);
+      setUploads((current) => [data.file, ...current]);
+      setSelectedFile(null);
+      setSlug('');
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    } catch (error) {
+      setUploadError(error instanceof Error ? error.message : 'Upload failed');
+    } finally {
+      setUploading(false);
     }
-
-    setUploadSuccess(`File uploaded. Download URL: /download/${data.file.slug}`);
-    setUploads((current) => [data.file, ...current]);
-    setSelectedFile(null);
-    setSlug('');
   };
 
   const handleLogout = () => {
@@ -173,6 +179,7 @@ export default function Dashboard() {
                     Select file
                   </label>
                   <input
+                    ref={fileInputRef}
                     type="file"
                     onChange={handleFileChange}
                     className="block w-full text-sm"

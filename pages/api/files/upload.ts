@@ -6,7 +6,7 @@ import { prisma } from '../../../lib/prisma';
 export const config = {
   api: {
     bodyParser: {
-      sizeLimit: '20mb',
+      sizeLimit: '100mb',
     },
   },
 };
@@ -43,6 +43,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       downloadUrl: `/download/${slug}`,
     });
   } catch (error) {
-    return res.status(500).json({ error: 'Upload failed' });
+    console.error('Upload failed:', error);
+    return res.status(500).json({ error: typeof error === 'string' ? error : 'Upload failed' });
   }
 }
