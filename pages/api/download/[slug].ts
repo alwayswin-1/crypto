@@ -39,10 +39,27 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   try {
     const stats = await fs.stat(filePath);
+    const safeName = file.originalName.replace(/"/g, '\"');
+    const encodedName = encodeURIComponent(file.originalName);
+
+    res.statusCode = 200;
     res.setHeader('Content-Type', 'application/octet-stream');
     res.setHeader('Content-Length', stats.size.toString());
-    res.setHeader('Content-Disposition', `attachment; filename="${file.originalName}"`);
+    res.setHeader('Content-Disposition', `attachment; filename="${safeName}"; filename*=UTF-8''${encodedName}`);
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+
     const stream = createReadStream(filePath);
+    stream.on('error', (error) => {
+      console.error('Download stream error:', error);
+      if (!res.headersSent) {
+        res.status(500).json({ error: 'Failed to deliver file' });
+      } else {
+        res.destroy(error);
+      }
+    });
+
     stream.pipe(res);
   } catch (error) {
     console.error('Download error:', error);
