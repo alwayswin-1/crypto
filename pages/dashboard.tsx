@@ -2,6 +2,18 @@
 import { useRouter } from 'next/router';
 
 export default function Dashboard() {
+  const countryNameFormatter = useMemo(
+    () => new Intl.DisplayNames(['en'], { type: 'region' }),
+    []
+  );
+
+  const formatCountryName = (country: string | undefined | null) => {
+    if (!country || country === 'unknown') return 'Unknown';
+    if (country.length === 2) {
+      return countryNameFormatter.of(country) ?? country;
+    }
+    return country;
+  };
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [uploads, setUploads] = useState<any[]>([]);
@@ -17,11 +29,16 @@ export default function Dashboard() {
 
   const downloaderByCountry = useMemo(() => {
     return downloaders.reduce((acc: Record<string, number>, item: any) => {
-      const country = item.country || 'unknown';
+      const country = formatCountryName(item.country || 'Unknown');
       acc[country] = (acc[country] || 0) + 1;
       return acc;
     }, {});
   }, [downloaders]);
+
+  const recentDownloaders = useMemo(
+    () => [...downloaders].sort((a, b) => new Date(b.createdAt).valueOf() - new Date(a.createdAt).valueOf()),
+    [downloaders]
+  );
 
   const fetchMetrics = async () => {
     const res = await fetch('/api/files');
@@ -218,38 +235,81 @@ export default function Dashboard() {
             )}
           </div>
 
-          <div className="rounded-xl border border-white/10 bg-slate-950/80 p-8">
-            <h2 className="text-2xl font-semibold mb-6">Downloads by Country</h2>
-            {Object.keys(downloaderByCountry).length === 0 ? (
-              <p className="text-slate-400">No downloads yet.</p>
-            ) : (
-              <div className="space-y-3">
-                {Object.entries(downloaderByCountry)
-                  .sort((a, b) => b[1] - a[1])
-                  .map(([country, count]) => (
-                    <div
-                      key={country}
-                      className="flex items-center justify-between rounded-lg bg-slate-900/50 px-3 py-2"
-                    >
-                      <span className="text-sm">{country}</span>
-                      <span className="font-semibold text-cyan-400">{count}</span>
-                    </div>
-                  ))}
+          <div className="rounded-[2rem] border border-white/10 bg-slate-950/90 p-6 shadow-2xl">
+            <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+              <div>
+                <h2 className="text-2xl font-semibold">Downloads by Country</h2>
+                <p className="mt-2 text-sm text-slate-400 max-w-xl">
+                  A quick glance at current download traffic by full country name and the most recent IP addresses.
+                </p>
               </div>
-            )}
+              <div className="flex items-center gap-2 rounded-full bg-slate-900/80 px-3 py-2 text-xs uppercase tracking-[0.25em] text-slate-400">
+                <span className="h-2.5 w-2.5 rounded-full bg-rose-400/80" />
+                <span className="h-2.5 w-2.5 rounded-full bg-amber-400/80" />
+                <span className="h-2.5 w-2.5 rounded-full bg-emerald-400/80" />
+                Visible at a glance
+              </div>
+            </div>
 
-            <div className="mt-8 border-t border-white/10 pt-6">
-              <h3 className="text-lg font-semibold mb-4">Recent Activity</h3>
-              <div className="space-y-3 max-h-64 overflow-y-auto">
-                {downloaders.slice(0, 10).map((item) => (
-                  <div key={item.id} className="text-xs text-slate-400 bg-slate-900/30 rounded p-2">
-                    <div className="font-semibold text-slate-300">{item.country || 'unknown'}</div>
-                    <div className="mt-1">{item.ip}</div>
-                    <div className="mt-1">
-                      {new Date(item.createdAt).toLocaleString()}
-                    </div>
-                  </div>
-                ))}
+            <div className="grid gap-6">
+              <div className="overflow-hidden rounded-3xl border border-white/10 bg-slate-900/70">
+                <div className="px-4 py-4 text-sm font-semibold uppercase tracking-[0.2em] text-slate-400 bg-slate-950/80">
+                  Country counts
+                </div>
+                <div className="overflow-x-auto">
+                  <table className="min-w-full divide-y divide-white/10 text-left text-sm text-slate-200">
+                    <thead className="bg-slate-950/80 text-slate-400">
+                      <tr>
+                        <th className="px-4 py-3">Country</th>
+                        <th className="px-4 py-3 text-right">Downloads</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-white/10 bg-slate-950/70">
+                      {Object.entries(downloaderByCountry)
+                        .sort((a, b) => b[1] - a[1])
+                        .map(([country, count]) => (
+                          <tr key={country}>
+                            <td className="px-4 py-3">{country}</td>
+                            <td className="px-4 py-3 text-right font-semibold text-cyan-400">{count}</td>
+                          </tr>
+                        ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <div className="overflow-hidden rounded-3xl border border-white/10 bg-slate-900/70">
+                <div className="px-4 py-4 text-sm font-semibold uppercase tracking-[0.2em] text-slate-400 bg-slate-950/80">
+                  Recent downloads
+                </div>
+                <div className="overflow-x-auto">
+                  <table className="min-w-full divide-y divide-white/10 text-left text-sm text-slate-200">
+                    <thead className="bg-slate-950/80 text-slate-400">
+                      <tr>
+                        <th className="px-4 py-3">Country</th>
+                        <th className="px-4 py-3">IP address</th>
+                        <th className="px-4 py-3">Time</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-white/10 bg-slate-950/70">
+                      {recentDownloaders.length === 0 ? (
+                        <tr>
+                          <td colSpan={3} className="px-4 py-6 text-center text-slate-400">
+                            No downloads recorded yet.
+                          </td>
+                        </tr>
+                      ) : (
+                        recentDownloaders.slice(0, 8).map((item) => (
+                          <tr key={item.id}>
+                            <td className="px-4 py-3">{formatCountryName(item.country)}</td>
+                            <td className="px-4 py-3 break-all text-slate-200">{item.ip}</td>
+                            <td className="px-4 py-3 text-slate-400">{new Date(item.createdAt).toLocaleString()}</td>
+                          </tr>
+                        ))
+                      )}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             </div>
           </div>
